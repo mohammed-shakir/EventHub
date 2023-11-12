@@ -1,10 +1,11 @@
 import React from 'react';
+import Navbar from '../components/Navbar.js';
 
 const Home = () => {
     return (
         <div>
-            <h1>Welcome to the Event Management Platform</h1>
-            {/* Home page content */}
+            <Navbar />
+            <h1>Home</h1>
         </div>
     );
 };

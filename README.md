@@ -6,6 +6,7 @@ EventHub is a full-stack web application for creating, managing, and participati
 
 - Node.js: Version 16.14.2
 - npm: Version 8.5.0
+- PostgreSQL: 16.0
 
 ## Installation
 
@@ -22,6 +23,25 @@ This command should be executed in each of these directories:
 - /EventHub/backend
 - /EventHub/frontend
 - /EventHub
+
+## Database Setup and Configuration
+
+EventHub uses PostgreSQL as its database. To get the database up and running on your local machine, follow these steps:
+
+- Install PostgreSQL: Follow the installation instructions on the PostgreSQL website for your operating system.
+- Open pgAdmin: Launch pgAdmin from your applications.
+- Create a New Server:
+  - Right-click on 'Servers' in the left pane and select 'Create' -> 'Server'.
+  - In the 'Create Server' dialog, enter the name 'EventHubDB' for the server.
+  - Switch to the 'Connection' tab and enter localhost in the 'Hostname/address' field.
+  - Enter the default PostgreSQL port 5432.
+  - Enter your PostgreSQL 'username' and 'password' and save.
+- Create a New Database:
+  - Right-click on 'Databases' under your new server, then choose 'Create' -> 'Database'.
+  - Name your database 'EventHubDB' and save.
+- Create the Tables for the Database:
+  - Right-click on your newly created database and press on 'Query Tool'.
+  - In the query tool, create the necessary tables.
 
 ## Running the Application
 
