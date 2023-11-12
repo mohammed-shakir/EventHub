@@ -1,6 +1,9 @@
 const express = require('express');
+const userController = require('../controllers/userController');
 const router = express.Router();
 
-// Add user-related routes (signup, login, etc.)
+router.post('/register', userController.register);
+router.post('/login', userController.login);
+router.get('/getUsers', userController.getUsers);
 
 module.exports = router;
