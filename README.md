@@ -40,8 +40,11 @@ EventHub uses PostgreSQL as its database. To get the database up and running on 
   - Right-click on 'Databases' under your new server, then choose 'Create' -> 'Database'.
   - Name your database 'EventHubDB' and save.
 - Create the Tables for the Database:
-  - Right-click on your newly created database and press on 'Query Tool'.
-  - In the query tool, create the necessary tables.
+  - To set up the database, run the `init_db.sql` script in your PostgreSQL environment. This script will create all the necessary tables with the required structure. You can use the following command in the PostgreSQL command line:
+  ```
+  psql -U [username] -d EventHubDB -a -f init_db.sql
+  ```
+  Replace [username] with your PostgreSQL username.
 
 ## Running the Application
 
