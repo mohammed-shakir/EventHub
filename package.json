@@ -1,0 +1,25 @@
+{
+  "name": "eventhub",
+  "version": "1.0.0",
+  "description": "Install all the necessary packages by navigating to the 'backend' directory and run:",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && npm start",
+    "client": "cd frontend && npm start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohammed-shakir/EventHub.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mohammed-shakir/EventHub/issues"
+  },
+  "homepage": "https://github.com/mohammed-shakir/EventHub#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
