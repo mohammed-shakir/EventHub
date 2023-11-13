@@ -30,6 +30,8 @@ const Home = () => {
             {userProfile && (
                 <div>
                     <p>Email: {userProfile.email}</p>
+                    <p>First Name: {userProfile.first_name}</p>
+                    <p>Last Name: {userProfile.last_name}</p>
                     <p>Role: {userProfile.user_role}</p>
                 </div>
             )}
