@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
-    const { email, password, user_role } = req.body;
+    const { email, password, first_name, last_name, user_role } = req.body;
 
     if (!email || !password) {
         return res.status(400).send('Email and password are required');
@@ -26,8 +26,8 @@ exports.register = async (req, res) => {
 
         // Insert new user into database
         await pool.query(
-            'INSERT INTO Users (email, password, user_role) VALUES ($1, $2, $3)',
-            [email, hashedPassword, role]
+            'INSERT INTO Users (email, password, first_name, last_name, user_role) VALUES ($1, $2, $3, $4, $5)',
+            [email, hashedPassword, first_name, last_name, role]
         );
 
         res.status(201).send('User registered successfully');
