@@ -78,7 +78,7 @@ exports.getUserProfile = async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        const userResult = await pool.query('SELECT email, user_role FROM Users WHERE user_id = $1', [decoded.user_id]);
+        const userResult = await pool.query('SELECT email, first_name, last_name, profile_picture_url, bio, user_role FROM Users WHERE user_id = $1', [decoded.user_id]);
         if (userResult.rows.length === 0) {
             return res.status(404).send('User not found');
         }
