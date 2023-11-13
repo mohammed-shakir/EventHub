@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getUserProfile, updateUserProfile } from '../api_calls/user';
+import { getUserProfile, updateUserProfile, deleteUserProfile, logout } from '../api_calls/user';
 
 const UserProfileForm = () => {
     const [profile, setProfile] = useState({
@@ -43,6 +43,17 @@ const UserProfileForm = () => {
         }
     };
 
+    const handleDeleteAccount = async () => {
+        if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            try {
+                await deleteUserProfile();
+                logout();
+            } catch (error) {
+                console.error('Error deleting account', error);
+            }
+        }
+    };
+
     return (
         <form onSubmit={handleSubmit}>
             <input
@@ -83,6 +94,7 @@ const UserProfileForm = () => {
                 placeholder="Bio"
             />
             <button type="submit">Update Profile</button>
+            <button onClick={handleDeleteAccount}>Delete Account</button>
         </form>
     );
 };

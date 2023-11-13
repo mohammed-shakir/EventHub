@@ -110,3 +110,17 @@ exports.updateUserProfile = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
+
+exports.deleteUserProfile = async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        await pool.query('DELETE FROM Users WHERE user_id = $1', [decoded.user_id]);
+
+        res.status(200).send('User account deleted successfully');
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server error');
+    }
+};
