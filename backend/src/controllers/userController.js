@@ -90,3 +90,23 @@ exports.getUserProfile = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
+
+exports.updateUserProfile = async (req, res) => {
+    const { email, first_name, last_name, profile_picture_url, bio } = req.body;
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        if (!email || !first_name || !last_name) {
+            return res.status(400).send('Required fields are missing');
+        }
+
+        const updateQuery = 'UPDATE Users SET email = $1, first_name = $2, last_name = $3, profile_picture_url = $4, bio = $5 WHERE user_id = $6';
+        await pool.query(updateQuery, [email, first_name, last_name, profile_picture_url, bio, decoded.user_id]);
+
+        res.status(200).send('Profile updated successfully');
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server error');
+    }
+};
