@@ -31,7 +31,7 @@ EventHub uses PostgreSQL as its database. To get the database up and running on 
 - Install PostgreSQL: Follow the installation instructions on the PostgreSQL website for your operating system.
 - Open pgAdmin: Launch pgAdmin from your applications.
 - Create a New Server:
-  - Right-click on 'Servers' in the left pane and select 'Create' -> 'Server'.
+  - Right-click on 'Servers' in the left pane and select 'Register' -> 'Server'.
   - In the 'Create Server' dialog, enter the name 'EventHubDB' for the server.
   - Switch to the 'Connection' tab and enter localhost in the 'Hostname/address' field.
   - Enter the default PostgreSQL port 5432.
@@ -40,11 +40,8 @@ EventHub uses PostgreSQL as its database. To get the database up and running on 
   - Right-click on 'Databases' under your new server, then choose 'Create' -> 'Database'.
   - Name your database 'EventHubDB' and save.
 - Create the Tables for the Database:
-  - To set up the database, run the `init_db.sql` script in your PostgreSQL environment. This script will create all the necessary tables with the required structure. You can use the following command in the PostgreSQL command line:
-  ```
-  psql -U [username] -d EventHubDB -a -f init_db.sql
-  ```
-  Replace [username] with your PostgreSQL username.
+  - Right click on your newly created db and chose 'Query Tools'.
+  - Copy the SQL commands that are in the init_db.sql file (it is in /backend) and paste them into the Query Tools and press the run button. Now you should have all the needed tables in your db.
 
 ## Running the Application
 
