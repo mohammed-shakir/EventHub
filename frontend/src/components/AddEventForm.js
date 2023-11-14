@@ -20,7 +20,7 @@ const AddEventForm = () => {
         try {
             await addEvent(newEvent);
             console.log('Event added successfully');
-            // Reset the form or provide further feedback
+            window.location.reload();
         } catch (error) {
             console.error('Error adding event', error);
         }

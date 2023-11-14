@@ -3,9 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import './App.css';
 import UserProfile from './pages/UserProfile';
 import Events from './pages/Events';
+import EventDetails from './pages/EventDetails';
+import './App.css';
 
 function App() {
   const isAuthenticated = localStorage.getItem('token');
@@ -19,6 +20,7 @@ function App() {
           <Route path="/" element={isAuthenticated ? <Home /> : <Navigate to="/login" />} />
           <Route path="/profile" element={isAuthenticated ? <UserProfile /> : <Navigate to="/login" />} />
           <Route path="/events" element={isAuthenticated ? <Events /> : <Navigate to="/login" />} />
+          <Route path="/events/:eventId" element={isAuthenticated ? <EventDetails /> : <Navigate to="/login" />} />
         </Routes>
       </div>
     </Router>
