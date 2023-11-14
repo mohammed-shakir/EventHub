@@ -30,6 +30,24 @@ export const getUserProfile = async () => {
   }
 };
 
+export const updateUserProfile = async (profileData) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/profile`, profileData, { headers: getAuthHeader() });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteUserProfile = async () => {
+  try {
+      const response = await axios.delete(`${BASE_URL}/profile`, { headers: getAuthHeader() });
+      return response.data;
+  } catch (error) {
+      throw error;
+  }
+};
+
 export const logout = () => {
   localStorage.removeItem('token');
   window.location.href = '/login';
