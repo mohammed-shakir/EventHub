@@ -2,12 +2,17 @@ CREATE TABLE Users (
     user_id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    user_role VARCHAR(50) NOT NULL CHECK (user_role IN ('Regular', 'Organizer', 'Admin')),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Profiles (
+    user_id INT PRIMARY KEY,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
-    user_role VARCHAR(50) NOT NULL CHECK (user_role IN ('Regular', 'Organizer', 'Admin')),
     profile_picture_url TEXT,
     bio TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
 CREATE TABLE Categories (
