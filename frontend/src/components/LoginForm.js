@@ -12,7 +12,6 @@ const LoginForm = () => {
       const response = await loginUser(userData);
       // Store JWT in local storage
       localStorage.setItem('token', response.token);
-      console.log('Login successful', response);
       window.location.href = '/';
     } catch (error) {
       console.error('Error during Login', error);

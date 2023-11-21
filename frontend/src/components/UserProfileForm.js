@@ -37,7 +37,6 @@ const UserProfileForm = () => {
         event.preventDefault();
         try {
             await updateUserProfile(profile);
-            console.log('Profile updated successfully');
         } catch (error) {
             console.error('Error updating profile', error);
         }

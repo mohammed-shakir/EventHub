@@ -19,7 +19,6 @@ const AddEventForm = () => {
         event.preventDefault();
         try {
             await addEvent(newEvent);
-            console.log('Event added successfully');
             window.location.reload();
         } catch (error) {
             console.error('Error adding event', error);

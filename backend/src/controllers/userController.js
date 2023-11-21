@@ -85,10 +85,8 @@ exports.getUserProfile = async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // const userResult = await pool.query('SELECT email, first_name, last_name, profile_picture_url, bio, user_role FROM Users WHERE user_id = $1', [decoded.user_id]);
-        
         const userResult = await pool.query(`
-            SELECT u.email, u.user_role, p.first_name, p.last_name, p.profile_picture_url, p.bio 
+            SELECT u.user_id, u.email, u.user_role, p.first_name, p.last_name, p.profile_picture_url, p.bio 
             FROM Users u 
             INNER JOIN Profiles p ON u.user_id = p.user_id 
             WHERE u.user_id = $1`, [decoded.user_id]);
@@ -114,9 +112,6 @@ exports.updateUserProfile = async (req, res) => {
         if (!email || !first_name || !last_name) {
             return res.status(400).send('Required fields are missing');
         }
-
-        // const updateQuery = 'UPDATE Users SET email = $1, first_name = $2, last_name = $3, profile_picture_url = $4, bio = $5 WHERE user_id = $6';
-        // await pool.query(updateQuery, [email, first_name, last_name, profile_picture_url, bio, decoded.user_id]);
 
         await pool.query('UPDATE Users SET email = $1 WHERE user_id = $2', [email, decoded.user_id]);
 

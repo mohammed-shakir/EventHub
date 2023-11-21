@@ -12,8 +12,7 @@ const RegistrationForm = () => {
     event.preventDefault();
     try {
       const userData = { email, password, first_name, last_name, user_role };
-      const response = await registerUser(userData);
-      console.log('Registration successful', response);
+      await registerUser(userData);
       window.location.href = '/login';
     } catch (error) {
       console.error('Error during registration', error);
