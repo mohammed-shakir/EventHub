@@ -33,6 +33,12 @@ const EventDetails = () => {
             <p>About: {event.description}</p>
             <p>Start Time: {event.start_time}</p>
             <p>End Time: {event.end_time}</p>
+            <h2>Registered Users</h2>
+            <ul>
+                {event.registered_users.map(user => (
+                    <li key={user.user_id}>{user.first_name} {user.last_name}</li>
+                ))}
+            </ul>
         </div>
     );
 };

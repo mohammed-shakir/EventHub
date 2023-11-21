@@ -30,3 +30,12 @@ export const getEventById = async (eventId) => {
         throw error;
     }
 };
+
+export const registerForEvent = async (eventId) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/register/${eventId}`, {}, { headers: getAuthHeader() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
