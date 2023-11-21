@@ -14,17 +14,26 @@ export const addEvent = async (eventData) => {
 
 
 export const getEvents = async () => {
-  try {
-    const response = await axios.get(`${BASE_URL}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+    try {
+        const response = await axios.get(`${BASE_URL}`, { headers: getAuthHeader() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const getEventById = async (eventId) => {
     try {
         const response = await axios.get(`${BASE_URL}/${eventId}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const checkUserRegistrationForEvent = async (eventId) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/checkRegistration/${eventId}`, { headers: getAuthHeader() });
         return response.data;
     } catch (error) {
         throw error;

@@ -1,31 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { getEvents, registerForEvent } from '../api_calls/event';
-import { getUserProfile } from '../api_calls/user';
 import { useNavigate } from 'react-router-dom';
 
-const EventList = ({ userRegistrations }) => {
+const EventList = () => {
     const [events, setEvents] = useState([]);
-    const [userProfile, setUserProfile] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchEventsAndProfile = async () => {
+        const fetchEvents = async () => {
             try {
-                const events = await getEvents();
-                const profile = await getUserProfile();
-                setEvents(events);
-                setUserProfile(profile);
+                const fetchedEvents = await getEvents();
+                setEvents(fetchedEvents);
             } catch (error) {
                 console.error('Error fetching events', error);
             }
         };
 
-        fetchEventsAndProfile();
+        fetchEvents();
     }, []);
 
     const handleRegister = async (eventId) => {
         try {
             await registerForEvent(eventId);
+            const updatedEvents = await getEvents();
+            setEvents(updatedEvents);
         } catch (error) {
             console.error('Error registering for event', error);
         }
@@ -38,11 +36,11 @@ const EventList = ({ userRegistrations }) => {
                 {events.map(event => (
                     <li key={event.event_id}>
                         <h3>{event.title}</h3>
-                        <p>Organized by: {event.first_name} {event.last_name}</p>
-                        {event.image_url && <img src={event.image_url} alt={event.title} />}
+                        <p>Organized by: {event.organizer_name}</p>
+                        <p>{event.image_url && <img src={event.image_url} alt={event.title} />}</p>
                         <p>Location: {event.location}</p>
                         <button onClick={() => navigate(`/events/${event.event_id}`)}>View more</button>
-                        {userProfile && userProfile.user_id !== event.organizer_id && !userRegistrations.includes(event.event_id) && !event.is_user_registered && (
+                        {!event.is_registered && (
                             <button onClick={() => handleRegister(event.event_id)}>Register</button>
                         )}
                         <hr />

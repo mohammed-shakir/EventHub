@@ -30,30 +30,20 @@ exports.addEvent = async (req, res) => {
 
 exports.getEvents = async (req, res) => {
     try {
-        let currentUserId = null;
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.user_id;
 
-        if (req.headers.authorization) {
-            const token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            currentUserId = decoded.user_id;
-        }
-
-        let eventsQuery = `
-            SELECT e.*, u.user_id as organizer_id, p.first_name, p.last_name
+        const eventsQuery = `
+            SELECT e.*, 
+                   CASE WHEN r.user_id IS NOT NULL THEN TRUE ELSE FALSE END as is_registered,
+                   p.first_name || ' ' || p.last_name as organizer_name
             FROM Events e
+            LEFT JOIN Registrations r ON e.event_id = r.event_id AND r.user_id = $1
             JOIN Users u ON e.organizer_id = u.user_id
             JOIN Profiles p ON u.user_id = p.user_id`;
 
-        if (currentUserId) {
-            eventsQuery = `
-                SELECT e.*, u.user_id as organizer_id, p.first_name, p.last_name,
-                       EXISTS (SELECT 1 FROM Registrations WHERE user_id = $1 AND event_id = e.event_id) as is_user_registered
-                FROM Events e
-                JOIN Users u ON e.organizer_id = u.user_id
-                JOIN Profiles p ON u.user_id = p.user_id`;
-        }
-
-        const events = currentUserId ? await pool.query(eventsQuery, [currentUserId]) : await pool.query(eventsQuery);
+        const events = await pool.query(eventsQuery, [userId]);
         res.json(events.rows);
     } catch (error) {
         console.error(error.message);
@@ -63,21 +53,29 @@ exports.getEvents = async (req, res) => {
 
 exports.getEventById = async (req, res) => {
     const eventId = req.params.eventId;
+
     try {
-        const eventQuery = `
-            SELECT e.*, 
-                   JSON_AGG(JSON_BUILD_OBJECT('user_id', u.user_id, 'first_name', p.first_name, 'last_name', p.last_name)) as registered_users
-            FROM Events e
-            LEFT JOIN Registrations r ON e.event_id = r.event_id
-            LEFT JOIN Users u ON r.user_id = u.user_id
-            LEFT JOIN Profiles p ON u.user_id = p.user_id
-            WHERE e.event_id = $1
-            GROUP BY e.event_id`;
+        const eventQuery = 'SELECT * FROM Events WHERE event_id = $1';
         const eventResult = await pool.query(eventQuery, [eventId]);
+
         if (eventResult.rows.length === 0) {
             return res.status(404).send('Event not found');
         }
-        res.json(eventResult.rows[0]);
+
+        const event = eventResult.rows[0];
+
+        // New query to fetch registered users
+        const regUsersQuery = `
+            SELECT u.user_id, p.first_name, p.last_name 
+            FROM Registrations r 
+            JOIN Users u ON r.user_id = u.user_id 
+            JOIN Profiles p ON u.user_id = p.user_id
+            WHERE r.event_id = $1
+        `;
+        const regUsersResult = await pool.query(regUsersQuery, [eventId]);
+        const registeredUsers = regUsersResult.rows;
+
+        res.json({ ...event, registeredUsers });
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Server error');
