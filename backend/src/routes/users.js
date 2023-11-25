@@ -10,5 +10,6 @@ router.put('/profile', userController.updateUserProfile);
 router.delete('/profile', userController.deleteUserProfile);
 router.delete('/admin_delete_user/:userId', auth, admin, userController.adminDeleteUser);
 router.get('/get_all_users', auth, admin, userController.getAllUsers);
+router.post('/auth/google', userController.authGoogle);
 
 module.exports = router;

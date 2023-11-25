@@ -21,6 +21,15 @@ export const loginUser = async (credentials) => {
   }
 };
 
+export const loginGoogle = async (data) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/auth/google`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getUserProfile = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/profile`, { headers: getAuthHeader() });
