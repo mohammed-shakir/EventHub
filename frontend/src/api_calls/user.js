@@ -57,6 +57,15 @@ export const adminDeleteUser = async (userId) => {
   }
 };
 
+export const getAllUsers = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/get_all_users`, { headers: getAuthHeader() });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const logout = () => {
   localStorage.removeItem('token');
   window.location.href = '/login';

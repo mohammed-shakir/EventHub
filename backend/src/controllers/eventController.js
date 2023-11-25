@@ -100,16 +100,6 @@ exports.registerForEvent = async (req, res) => {
     }
 };
 
-exports.getAllEvents = async (req, res) => {
-    try {
-        const users = await pool.query('SELECT * FROM Events');
-        res.json(users.rows);
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).send('Server error');
-    }
-};
-
 exports.adminDeleteEvent = async (req, res) => {
     const eventId = req.params.eventId;
 
@@ -120,4 +110,4 @@ exports.adminDeleteEvent = async (req, res) => {
         console.error(error.message);
         res.status(500).send('Server error');
     }
-}
+};

@@ -19,8 +19,8 @@ function App() {
   };
 
   const AdminRoute = ({ children }) => {
-
     const [userProfile, setUserProfile] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -29,16 +29,20 @@ function App() {
                 setUserProfile(profile);
             } catch (error) {
                 console.error('Error fetching user profile', error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
         fetchUserProfile();
     }, []);
 
-    console.log(userProfile.user_role);
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     return isAuthenticated && userProfile && (userProfile.user_role === 'Admin') ? children : <Navigate to="/" />;
-  }
+}
 
   return (
     <Router>

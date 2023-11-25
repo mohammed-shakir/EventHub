@@ -1,30 +1,55 @@
-import React from 'react';
-// import React, { useEffect, useState } from 'react';
-// import { getAllUsers, deleteAUser } from '../api_calls/user';
-// import { getAllEvents, deleteAnEvent } from '../api_calls/event';
+import React, { useEffect, useState } from 'react';
+import { getAllUsers, adminDeleteUser } from '../api_calls/user';
+import { getEvents, adminDeleteEvent } from '../api_calls/event';
 
 const AdminPanel = () => {
-/*
   const [users, setUsers] = useState([]);
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    // Fetch users and events
+    fetchAllUsersAndAllEvents();
   }, []);
 
-  const handleDeleteUser = (userId) => {
-    // Call API to delete user and update state
+  const fetchAllUsersAndAllEvents = async () => {
+    try {
+      const usersData = await getAllUsers();
+      const eventsData = await getEvents();
+      setUsers(usersData);
+      setEvents(eventsData);
+    } catch (error) {
+      console.error('Error fetching users and events', error);
+    }
   };
 
-  const handleDeleteEvent = (eventId) => {
-    // Call API to delete event and update state
+  const handleDeleteUser = async (userId) => {
+    await adminDeleteUser(userId);
+    fetchAllUsersAndAllEvents();
   };
-*/
+
+  const handleDeleteEvent = async (eventId) => {
+    await adminDeleteEvent(eventId);
+    fetchAllUsersAndAllEvents();
+  };
+
   return (
     <div>
-      {
-        <h1>Admin Panel</h1>
-      }
+      <h1>Admin Panel</h1>
+      <div>
+        <h2>All Users</h2>
+        {users.map(user => (
+          <div key={user.user_id}>
+            <span>{user.email} - {user.user_role}</span>
+            <button onClick={() => handleDeleteUser(user.user_id)}>Delete User</button>
+          </div>
+        ))}
+        <h2>All Events</h2>
+        {events.map(event => (
+          <div key={event.event_id}>
+            <span>{event.title} - {event.start_time}</span>
+            <button onClick={() => handleDeleteEvent(event.event_id)}>Delete Event</button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

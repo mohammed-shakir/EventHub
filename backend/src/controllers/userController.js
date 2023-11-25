@@ -136,25 +136,26 @@ exports.deleteUserProfile = async (req, res) => {
     }
 };
 
-exports.adminDeleteUser = async (req, res) => {
-    const userId = req.params.userId;
-
+exports.getAllUsers = async (req, res) => {
     try {
-        await pool.query('DELETE FROM Profiles WHERE user_id = $1', [userId]);
-
-        await pool.query('DELETE FROM Users WHERE user_id = $1', [userId]);
-
-        res.status(200).send('User account deleted successfully');
+        const users = await pool.query('SELECT * FROM Users');
+        res.json(users.rows);
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Server error');
     }
 };
 
-exports.getAllUsers = async (req, res) => {
+exports.adminDeleteUser = async (req, res) => {
+    const userId = req.params.userId;
+
     try {
-        const users = await pool.query('SELECT * FROM Users');
-        res.json(users.rows);
+        await pool.query('DELETE FROM Registrations WHERE user_id = $1', [userId]);
+
+        await pool.query('DELETE FROM Profiles WHERE user_id = $1', [userId]);
+        await pool.query('DELETE FROM Users WHERE user_id = $1', [userId]);
+
+        res.status(200).send('User account deleted successfully');
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Server error');
