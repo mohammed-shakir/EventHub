@@ -1,6 +1,9 @@
 const pool = require('../utils/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
+const crypto = require('crypto');
+
 
 exports.register = async (req, res) => {
     const { email, password, first_name, last_name, user_role } = req.body;
@@ -76,6 +79,63 @@ exports.login = async (req, res) => {
         res.json({ token });
     } catch (error) {
         console.error(error.message);
+        res.status(500).send('Server error');
+    }
+};
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+exports.authGoogle = async (req, res) => {
+    try {
+        const { token } = req.body;
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+
+        // Extract user info from payload
+        const { email, given_name, family_name } = payload;
+
+        let userResult = await pool.query('SELECT * FROM Users WHERE email = $1', [email]);
+
+        let userId, userRole;
+
+        if (userResult.rows.length === 0) {
+            const randomPassword = crypto.randomBytes(16).toString('hex');
+
+            // Random password
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(randomPassword, salt);
+
+            let newUser = await pool.query(
+                'INSERT INTO Users (email, password, user_role) VALUES ($1, $2, $3) RETURNING user_id, user_role',
+                [email, hashedPassword, 'Regular']
+            );
+
+            userId = newUser.rows[0].user_id;
+            userRole = 'Regular';
+
+            await pool.query(
+                'INSERT INTO Profiles (user_id, first_name, last_name) VALUES ($1, $2, $3)',
+                [userId, given_name, family_name]
+            );
+        } else {
+            // User already exists
+            userId = userResult.rows[0].user_id;
+            userRole = userResult.rows[0].user_role;
+        }
+
+        // Generate JWT token
+        const jwtToken = jwt.sign(
+            { user_id: userId, role: userRole },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({ token: jwtToken });
+    } catch (error) {
+        console.error('Error during Google login:', error.message);
         res.status(500).send('Server error');
     }
 };
