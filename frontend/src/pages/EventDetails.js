@@ -12,12 +12,21 @@ const EventDetails = () => {
     const navigate = useNavigate();
     const [userProfile, setUserProfile] = useState(null);
 
+    const formatDateForInput = (dateTimeStr) => {
+        const date = new Date(dateTimeStr);
+        return date.toISOString().slice(0, 16);
+    };
+
     useEffect(() => {
         const fetchEventAndUser = async () => {
             try {
                 const eventData = await getEventById(eventId);
                 setEvent(eventData);
-                setUpdatedEvent(eventData);
+                setUpdatedEvent({
+                    ...eventData,
+                    start_time: formatDateForInput(eventData.start_time),
+                    end_time: formatDateForInput(eventData.end_time)
+                });
                 const profile = await getUserProfile();
                 setUserProfile(profile);
             } catch (error) {
@@ -66,7 +75,7 @@ const EventDetails = () => {
             {!editMode ? (
                 <>
                     <h1>{event.title}</h1>
-                    <img src={event.image_url} alt={event.title} />
+                    <img src={event.image_url} alt={event.image_url} />
                     <p>Location: {event.location}</p>
                     <p>About: {event.description}</p>
                     <p>Start Time: {event.start_time}</p>
