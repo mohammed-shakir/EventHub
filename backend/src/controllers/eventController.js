@@ -64,7 +64,6 @@ exports.getEventById = async (req, res) => {
 
         const event = eventResult.rows[0];
 
-        // New query to fetch registered users
         const regUsersQuery = `
             SELECT u.user_id, p.first_name, p.last_name 
             FROM Registrations r 
@@ -95,6 +94,18 @@ exports.registerForEvent = async (req, res) => {
 
         await pool.query('INSERT INTO Registrations (user_id, event_id) VALUES ($1, $2)', [decoded.user_id, eventId]);
         res.status(200).send('Registered successfully');
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server error');
+    }
+};
+
+exports.adminDeleteEvent = async (req, res) => {
+    const eventId = req.params.eventId;
+
+    try {
+        await pool.query('DELETE FROM Events WHERE event_id = $1', [eventId]);
+        res.status(200).send('Event deleted successfully');
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Server error');
