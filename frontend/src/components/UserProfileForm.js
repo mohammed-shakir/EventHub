@@ -7,25 +7,26 @@ const UserProfileForm = () => {
         first_name: '',
         last_name: '',
         profile_picture_url: '',
-        bio: ''
+        bio: '',
     });
-
+    
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
                 const userProfile = await getUserProfile();
-                setProfile({
-                    email: userProfile.email,
-                    first_name: userProfile.first_name,
-                    last_name: userProfile.last_name,
-                    profile_picture_url: userProfile.profile_picture_url,
-                    bio: userProfile.bio
-                });
+                setProfile(prevState => ({
+                    ...prevState,
+                    email: userProfile.email || '',
+                    first_name: userProfile.first_name || '',
+                    last_name: userProfile.last_name || '',
+                    profile_picture_url: userProfile.profile_picture_url || '',
+                    bio: userProfile.bio || '',
+                }));
             } catch (error) {
                 console.error('Error fetching user profile', error);
             }
         };
-
+    
         fetchUserProfile();
     }, []);
 
