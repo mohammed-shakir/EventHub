@@ -1,9 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import AdminPanel from '../components/AdminPanel';
+import Navbar from '../components/Navbar.js';
 import { getUserProfile } from '../api_calls/user';
 import { useState, useEffect } from 'react';
 
-const Navbar = () => {
+const Admin = () => {
     const [userProfile, setUserProfile] = useState(null);
 
     useEffect(() => {
@@ -20,16 +21,12 @@ const Navbar = () => {
     }, []);
 
     return (
-        <nav>
-            <h1>Navbar</h1>
-            <ul>
-                <li><Link to="/">Home</Link></li>
-                <li><Link to="/profile">Profile</Link></li>
-                <li><Link to="/events">Events</Link></li>
-                {userProfile && (userProfile.user_role === 'Admin') && <li><Link to="/admin">Admin</Link></li>}
-            </ul>
-        </nav>
+        <div>
+            <Navbar />
+            <h1>Admin</h1>
+            {userProfile && (userProfile.user_role === 'Admin') && <AdminPanel />}
+        </div>
     );
 };
 
-export default Navbar;
+export default Admin;

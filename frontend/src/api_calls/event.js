@@ -66,3 +66,12 @@ export const deleteEvent = async (eventId) => {
         throw error;
     }
 };
+
+export const adminDeleteEvent = async (eventId) => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/admin_delete_event/${eventId}`, { headers: getAuthHeader() });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
