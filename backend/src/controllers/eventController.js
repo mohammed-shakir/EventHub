@@ -107,7 +107,6 @@ exports.updateEvent = async (req, res) => {
     const token = req.headers.authorization.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Check if the user is the organizer of the event or an admin
     const eventQuery = 'SELECT * FROM Events WHERE event_id = $1';
     const eventResult = await pool.query(eventQuery, [eventId]);
     if (eventResult.rows.length === 0) {
@@ -129,7 +128,6 @@ exports.deleteEvent = async (req, res) => {
     const token = req.headers.authorization.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Check if the user is the organizer of the event or an admin
     const eventQuery = 'SELECT * FROM Events WHERE event_id = $1';
     const eventResult = await pool.query(eventQuery, [eventId]);
     if (eventResult.rows.length === 0) {
