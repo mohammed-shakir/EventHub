@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { addEvent } from '../api_calls/event';
+import { getCategories } from '../api_calls/category';
+import { useEffect } from 'react';
 
 const AddEventForm = () => {
     const [newEvent, setNewEvent] = useState({
@@ -10,6 +12,21 @@ const AddEventForm = () => {
         location: '',
         image_url: ''
     });
+
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const categoryData = await getCategories();
+                setCategories(categoryData);
+            } catch (error) {
+                console.error('Error fetching categories', error);
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     const handleChange = (e) => {
         setNewEvent({ ...newEvent, [e.target.name]: e.target.value });
@@ -72,6 +89,17 @@ const AddEventForm = () => {
                 onChange={handleChange}
                 placeholder="Image URL"
             />
+            <select
+                name="category_id"
+                value={newEvent.category_id}
+                onChange={handleChange}
+            >
+                {categories.map(category => (
+                    <option key={category.category_id} value={category.category_id}>
+                        {category.name}
+                    </option>
+                ))}
+            </select>
             <button type="submit">Add Event</button>
         </form>
     );

@@ -51,6 +51,7 @@ export const updateUserProfile = async (profileData) => {
 export const deleteUserProfile = async () => {
   try {
       const response = await axios.delete(`${BASE_URL}/profile`, { headers: getAuthHeader() });
+      console.log(response.data);
       return response.data;
   } catch (error) {
       throw error;
@@ -76,6 +77,7 @@ export const getAllUsers = async () => {
 }
 
 export const logout = () => {
+  console.log('Logging out');
   localStorage.removeItem('token');
   window.location.href = '/login';
 };

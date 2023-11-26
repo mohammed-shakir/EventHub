@@ -3,9 +3,14 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const crypto = require('crypto');
+const { validationResult } = require('express-validator');
 
 
 exports.register = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     const { email, password, first_name, last_name, user_role } = req.body;
 
     if (!email || !password) {
@@ -43,6 +48,10 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -181,18 +190,26 @@ exports.updateUserProfile = async (req, res) => {
 };
 
 exports.deleteUserProfile = async (req, res) => {
+    const client = await pool.connect();
     try {
+        await client.query('BEGIN');
+
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.user_id;
 
-        await pool.query('DELETE FROM Profiles WHERE user_id = $1', [decoded.user_id]);
+        await client.query('DELETE FROM Registrations WHERE user_id = $1', [userId]);
+        await client.query('DELETE FROM Profiles WHERE user_id = $1', [userId]);
+        await client.query('DELETE FROM Users WHERE user_id = $1', [userId]);
 
-        await pool.query('DELETE FROM Users WHERE user_id = $1', [decoded.user_id]);
-
+        await client.query('COMMIT');
         res.status(200).send('User account deleted successfully');
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send('Server error');
+        await client.query('ROLLBACK');
+        console.error('Error in deleteUserProfile:', error.message);
+        res.status(500).send('Error deleting user profile');
+    } finally {
+        client.release();
     }
 };
 
@@ -207,13 +224,22 @@ exports.getAllUsers = async (req, res) => {
 };
 
 exports.adminDeleteUser = async (req, res) => {
-    const userId = req.params.userId;
+    const userIdToDelete = req.params.userId;
 
     try {
-        await pool.query('DELETE FROM Registrations WHERE user_id = $1', [userId]);
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const adminUserId = decoded.user_id;
 
-        await pool.query('DELETE FROM Profiles WHERE user_id = $1', [userId]);
-        await pool.query('DELETE FROM Users WHERE user_id = $1', [userId]);
+        // Prevent admin from deleting their own account
+        if (userIdToDelete == adminUserId) {
+            return res.status(403).send('Admin cannot delete their own account');
+        }
+
+        await pool.query('DELETE FROM Registrations WHERE user_id = $1', [userIdToDelete]);
+
+        await pool.query('DELETE FROM Profiles WHERE user_id = $1', [userIdToDelete]);
+        await pool.query('DELETE FROM Users WHERE user_id = $1', [userIdToDelete]);
 
         res.status(200).send('User account deleted successfully');
     } catch (error) {
