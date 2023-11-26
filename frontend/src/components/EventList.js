@@ -31,13 +31,13 @@ const EventList = () => {
 
     return (
         <div>
-            <h2>Events</h2>
+            <h2>Event Listings</h2>
             <ul>
                 {events.map(event => (
                     <li key={event.event_id}>
                         <h3>{event.title}</h3>
                         <p>Organized by: {event.organizer_name}</p>
-                        <p>{event.image_url && <img src={event.image_url} alt={event.title} />}</p>
+                        <p>{event.image_url && <img src={event.image_url} alt={event.image_url} />}</p>
                         <p>Location: {event.location}</p>
                         <button onClick={() => navigate(`/events/${event.event_id}`)}>View more</button>
                         {!event.is_registered && (

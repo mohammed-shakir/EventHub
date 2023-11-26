@@ -26,6 +26,7 @@ const Events = () => {
             <Navbar />
             <h1>Events</h1>
             {userProfile && (userProfile.user_role === 'Admin' || userProfile.user_role === 'Organizer') && <AddEventForm />}
+            <hr />
             <EventList />
         </div>
     );

@@ -27,6 +27,7 @@ const AddEventForm = () => {
 
     return (
         <form onSubmit={handleSubmit}>
+            <h2>Add Event</h2>
             <input
                 type="text"
                 name="title"

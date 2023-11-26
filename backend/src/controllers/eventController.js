@@ -100,6 +100,49 @@ exports.registerForEvent = async (req, res) => {
     }
 };
 
+exports.updateEvent = async (req, res) => {
+    const { eventId } = req.params;
+    const { title, description, start_time, end_time, location, image_url } = req.body;
+    const token = req.headers.authorization.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const eventQuery = 'SELECT * FROM Events WHERE event_id = $1';
+    const eventResult = await pool.query(eventQuery, [eventId]);
+    if (eventResult.rows.length === 0) {
+        return res.status(404).send('Event not found');
+    }
+
+    const event = eventResult.rows[0];
+    if (event.organizer_id !== decoded.user_id && decoded.role !== 'Admin') {
+        return res.status(403).send('Unauthorized to update this event');
+    }
+
+    const updateQuery = `UPDATE Events SET title = $1, description = $2, start_time = $3, end_time = $4, location = $5, image_url = $6 WHERE event_id = $7`;
+    await pool.query(updateQuery, [title, description, start_time, end_time, location, image_url, eventId]);
+    res.status(200).send('Event updated successfully');
+};
+
+exports.deleteEvent = async (req, res) => {
+    const { eventId } = req.params;
+    const token = req.headers.authorization.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const eventQuery = 'SELECT * FROM Events WHERE event_id = $1';
+    const eventResult = await pool.query(eventQuery, [eventId]);
+    if (eventResult.rows.length === 0) {
+        return res.status(404).send('Event not found');
+    }
+
+    const event = eventResult.rows[0];
+    if (event.organizer_id !== decoded.user_id && decoded.role !== 'Admin') {
+        return res.status(403).send('Unauthorized to delete this event');
+    }
+
+    const deleteQuery = 'DELETE FROM Events WHERE event_id = $1';
+    await pool.query(deleteQuery, [eventId]);
+    res.status(200).send('Event deleted successfully');
+};
+
 exports.adminDeleteEvent = async (req, res) => {
     const eventId = req.params.eventId;
 
