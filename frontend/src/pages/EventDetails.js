@@ -3,14 +3,16 @@ import Navbar from '../components/Navbar.js';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getEventById, updateEvent, deleteEvent } from '../api_calls/event';
 import { getUserProfile } from '../api_calls/user';
+import { getCategories } from '../api_calls/category';
 
 const EventDetails = () => {
     const [event, setEvent] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const [updatedEvent, setUpdatedEvent] = useState({});
+    const [userProfile, setUserProfile] = useState(null);
+    const [categories, setCategories] = useState([]);
     const { eventId } = useParams();
     const navigate = useNavigate();
-    const [userProfile, setUserProfile] = useState(null);
 
     const formatDateForInput = (dateTimeStr) => {
         const date = new Date(dateTimeStr);
@@ -34,7 +36,17 @@ const EventDetails = () => {
             }
         };
 
+        const fetchCategories = async () => {
+            try {
+                const categoryData = await getCategories();
+                setCategories(categoryData);
+            } catch (error) {
+                console.error('Error fetching categories', error);
+            }
+        };
+
         fetchEventAndUser();
+        fetchCategories();
     }, [eventId]);
 
     const toggleEditMode = () => {
@@ -103,6 +115,17 @@ const EventDetails = () => {
                     <input type="datetime-local" name="end_time" value={updatedEvent.end_time} onChange={handleChange} required />
                     <input type="text" name="location" value={updatedEvent.location} onChange={handleChange} required placeholder="Location"/>
                     <input type="text" name="image_url" value={updatedEvent.image_url} onChange={handleChange} placeholder="Image URL"/>
+                    <select
+                        name="category_id"
+                        value={updatedEvent.category_id}
+                        onChange={handleChange}
+                    >
+                        {categories.map(category => (
+                            <option key={category.category_id} value={category.category_id}>
+                                {category.name}
+                            </option>
+                        ))}
+                    </select>
                     <button type="submit">Update Event</button>
                     <button type="button" onClick={toggleEditMode}>Cancel</button>
                 </form>

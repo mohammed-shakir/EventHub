@@ -1,8 +1,13 @@
 const pool = require('../utils/database');
 const jwt = require('jsonwebtoken');
+const { validationResult } = require('express-validator');
 
 exports.addEvent = async (req, res) => {
-    const { title, description, start_time, end_time, location, image_url } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    const { title, description, start_time, end_time, location, image_url, category_id } = req.body;
 
     try {
         const token = req.headers.authorization.split(' ')[1];
@@ -12,14 +17,14 @@ exports.addEvent = async (req, res) => {
         const created_at = new Date();
 
         const insertQuery = `INSERT INTO Events 
-            (organizer_id, title, description, start_time, end_time, location, image_url, created_at) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`;
+            (organizer_id, title, description, start_time, end_time, location, image_url, category_id, created_at) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
         
         if (decoded.role !== 'Organizer' && decoded.role !== 'Admin') {
             return res.status(403).send('Unauthorized to create events');
         }
         
-        await pool.query(insertQuery, [organizer_id, title, description, start_time, end_time, location, image_url, created_at]);
+        await pool.query(insertQuery, [organizer_id, title, description, start_time, end_time, location, image_url, category_id, created_at]);
 
         res.status(200).send('Event added successfully');
     } catch (error) {
@@ -102,7 +107,7 @@ exports.registerForEvent = async (req, res) => {
 
 exports.updateEvent = async (req, res) => {
     const { eventId } = req.params;
-    const { title, description, start_time, end_time, location, image_url } = req.body;
+    const { title, description, start_time, end_time, location, image_url, category_id } = req.body;
     const token = req.headers.authorization.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -117,8 +122,8 @@ exports.updateEvent = async (req, res) => {
         return res.status(403).send('Unauthorized to update this event');
     }
 
-    const updateQuery = `UPDATE Events SET title = $1, description = $2, start_time = $3, end_time = $4, location = $5, image_url = $6 WHERE event_id = $7`;
-    await pool.query(updateQuery, [title, description, start_time, end_time, location, image_url, eventId]);
+    const updateQuery = `UPDATE Events SET title = $1, description = $2, start_time = $3, end_time = $4, location = $5, image_url = $6, category_id = $7 WHERE event_id = $8`;
+    await pool.query(updateQuery, [title, description, start_time, end_time, location, image_url, category_id, eventId]);
     res.status(200).send('Event updated successfully');
 };
 

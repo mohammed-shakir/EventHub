@@ -1,10 +1,19 @@
 const express = require('express');
+const { body } = require('express-validator');
 const userController = require('../controllers/userController');
 const router = express.Router();
 const { auth, admin } = require('../middleware/auth');
 
-router.post('/register', userController.register);
-router.post('/login', userController.login);
+router.post('/register', 
+    body('email').isEmail(),
+    body('password').isLength({ min: 6 }),
+    userController.register
+);
+router.post('/login', 
+    body('email').isEmail(),
+    body('password').isLength({ min: 6 }),
+    userController.login
+);
 router.get('/profile', userController.getUserProfile);
 router.put('/profile', userController.updateUserProfile);
 router.delete('/profile', userController.deleteUserProfile);
