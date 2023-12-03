@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const crypto = require('crypto');
 const { validationResult } = require('express-validator');
+const upload = require('../middleware/multerConfig');
+const { uploadFileToStorage } = require('../utils/firebaseStorageUtils');
 
 
 exports.register = async (req, res) => {
@@ -46,6 +48,18 @@ exports.register = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
+
+exports.uploadUserProfilePicture = async (req, res) => {
+    try {
+      const fileUrl = await uploadFileToStorage(req.file);
+      // Update the database with the file URL
+      // ...
+      return res.status(200).json({ message: 'Profile picture uploaded successfully', url: fileUrl });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error uploading file');
+    }
+  };
 
 exports.login = async (req, res) => {
     const errors = validationResult(req);

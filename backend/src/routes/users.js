@@ -3,6 +3,7 @@ const { body } = require('express-validator');
 const userController = require('../controllers/userController');
 const router = express.Router();
 const { auth, admin } = require('../middleware/auth');
+const upload = require('../middleware/multerConfig');
 
 router.post('/register', 
     body('email').isEmail(),
@@ -20,5 +21,6 @@ router.delete('/profile', userController.deleteUserProfile);
 router.delete('/admin_delete_user/:userId', auth, admin, userController.adminDeleteUser);
 router.get('/get_all_users', auth, admin, userController.getAllUsers);
 router.post('/auth/google', userController.authGoogle);
+router.post('/profile/picture', upload.single('profilePic'), userController.uploadUserProfilePicture);
 
 module.exports = router;

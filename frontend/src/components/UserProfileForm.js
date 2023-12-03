@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getUserProfile, updateUserProfile, deleteUserProfile, logout } from '../api_calls/user';
+import { getUserProfile, updateUserProfile, deleteUserProfile, logout, uploadProfilePicture } from '../api_calls/user';
 
 const UserProfileForm = () => {
     const [profile, setProfile] = useState({
@@ -54,6 +54,18 @@ const UserProfileForm = () => {
         }
     };
 
+    const handleProfilePicUpload = async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          try {
+            const response = await uploadProfilePicture(file);
+            setProfile({ ...profile, profile_picture_url: response.url });
+          } catch (error) {
+            console.error('Error uploading profile picture', error);
+          }
+        }
+      };
+
     return (
         <form onSubmit={handleSubmit}>
             <input
@@ -94,6 +106,7 @@ const UserProfileForm = () => {
                 placeholder="Bio"
             />
             <button type="submit">Update Profile</button>
+            <input type="file" onChange={handleProfilePicUpload} />
             <button onClick={handleDeleteAccount}>Delete Account</button>
         </form>
     );
