@@ -17,7 +17,7 @@ export const uploadProfilePicture = async (fileData) => {
   formData.append('profilePic', fileData);
 
   try {
-    const response = await axios.post(`${BASE_URL}/profile/picture`, formData, getAuthHeader());
+    const response = await axios.post(`${BASE_URL}/profile/picture`, formData, { headers: getAuthHeader() });
     return response.data;
   } catch (error) {
     throw error;

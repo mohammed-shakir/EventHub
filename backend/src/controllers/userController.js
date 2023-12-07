@@ -51,15 +51,25 @@ exports.register = async (req, res) => {
 
 exports.uploadUserProfilePicture = async (req, res) => {
     try {
-      const fileUrl = await uploadFileToStorage(req.file);
-      // Update the database with the file URL
-      // ...
-      return res.status(200).json({ message: 'Profile picture uploaded successfully', url: fileUrl });
+        const userId = req.user.user_id;
+        const fileName = req.file.originalname;
+        const filePath = `users/${userId}/profile_picture/${fileName}`;
+
+        await uploadFileToStorage(req.file, filePath);
+
+        await pool.query(
+            'UPDATE Profiles SET profile_picture_url = $1 WHERE user_id = $2',
+            [filePath, userId]
+        );
+
+        return res.status(200).json({ message: 'Profile picture uploaded successfully', filePath });
     } catch (error) {
-      console.error(error);
-      res.status(500).send('Error uploading file');
+        console.error(error);
+        res.status(500).send('Error uploading file');
     }
-  };
+};
+
+
 
 exports.login = async (req, res) => {
     const errors = validationResult(req);

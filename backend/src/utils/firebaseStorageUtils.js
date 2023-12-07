@@ -1,27 +1,20 @@
-const { storage } = require('../firebaseConfig');
+const { ref, uploadBytes } = require('firebase/storage');
+const storage = require('../firebaseConfig');
 
-const uploadFileToStorage = (file) => {
+const uploadFileToStorage = (file, filePath) => {
   return new Promise((resolve, reject) => {
     if (!file) {
       reject('No file available');
     }
 
-    const storageRef = storage.ref(`uploads/${file.originalname}`);
-    const uploadTask = storageRef.put(file.buffer);
-
-    uploadTask.on('state_changed', 
-      (snapshot) => {
-        // Handle progress
-      }, 
-      (error) => {
+    const storageRef = ref(storage, filePath);
+    uploadBytes(storageRef, file.buffer)
+      .then(() => {
+        resolve(filePath);
+      })
+      .catch((error) => {
         reject(error);
-      }, 
-      () => {
-        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-          resolve(downloadURL);
-        });
-      }
-    );
+      });
   });
 };
 
