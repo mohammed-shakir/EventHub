@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getUserProfile, updateUserProfile, deleteUserProfile, logout, uploadProfilePicture } from '../api_calls/user';
 
 const UserProfileForm = () => {
@@ -9,6 +9,8 @@ const UserProfileForm = () => {
         profile_picture_url: '',
         bio: '',
     });
+
+    const fileInputRef = useRef(null);
     
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -54,17 +56,17 @@ const UserProfileForm = () => {
         }
     };
 
-    const handleProfilePicUpload = async (event) => {
-        const file = event.target.files[0];
-        if (file) {
-          try {
-            const response = await uploadProfilePicture(file);
-            setProfile({ ...profile, profile_picture_url: response.url });
-          } catch (error) {
-            console.error('Error uploading profile picture', error);
-          }
+    const handleProfilePicUpload = async () => {
+        if (fileInputRef.current && fileInputRef.current.files[0]) {
+            const file = fileInputRef.current.files[0];
+            try {
+                const response = await uploadProfilePicture(file);
+                setProfile({ ...profile, profile_picture_url: response.url });
+            } catch (error) {
+                console.error('Error uploading profile picture', error);
+            }
         }
-      };
+    };
 
     return (
         <form onSubmit={handleSubmit}>
@@ -92,13 +94,13 @@ const UserProfileForm = () => {
                 required
                 placeholder="Last Name"
             />
-            <input
+            {/*<input
                 type="text"
                 name="profile_picture_url"
                 value={profile.profile_picture_url}
                 onChange={handleChange}
                 placeholder="Profile Picture URL"
-            />
+            />*/}
             <textarea
                 name="bio"
                 value={profile.bio}
@@ -106,8 +108,9 @@ const UserProfileForm = () => {
                 placeholder="Bio"
             />
             <button type="submit">Update Profile</button>
-            <input type="file" onChange={handleProfilePicUpload} />
             <button onClick={handleDeleteAccount}>Delete Account</button>
+            <input type="file" ref={fileInputRef} />
+            <button type="button" onClick={handleProfilePicUpload}>Upload</button>
         </form>
     );
 };
