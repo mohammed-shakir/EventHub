@@ -11,27 +11,26 @@ const UserProfileForm = () => {
     });
     const fileInputRef = useRef(null);
 
+    const defaultProfilePic = '/assets/default/pfp.png';
+
     const fetchUserProfile = async () => {
         try {
             const userProfile = await getUserProfile();
+            let profilePicUrl = defaultProfilePic;
             if (userProfile.profile_picture_url) {
-                const url = await getProfilePictureUrl(userProfile.profile_picture_url);
-                setProfile({
-                    email: userProfile.email || '',
-                    first_name: userProfile.first_name || '',
-                    last_name: userProfile.last_name || '',
-                    bio: userProfile.bio || '',
-                    profile_picture_url: url
-                });
-            } else {
-                setProfile({
-                    email: userProfile.email || '',
-                    first_name: userProfile.first_name || '',
-                    last_name: userProfile.last_name || '',
-                    bio: userProfile.bio || '',
-                    profile_picture_url: ''
-                });
+                try {
+                    profilePicUrl = await getProfilePictureUrl(userProfile.profile_picture_url);
+                } catch (error) {
+                    console.error('Error fetching profile picture URL', error);
+                }
             }
+            setProfile({
+                email: userProfile.email || '',
+                first_name: userProfile.first_name || '',
+                last_name: userProfile.last_name || '',
+                bio: userProfile.bio || '',
+                profile_picture_url: profilePicUrl,
+            });
         } catch (error) {
             console.error('Error fetching user profile', error);
         }
@@ -79,7 +78,7 @@ const UserProfileForm = () => {
 
     return (
         <form onSubmit={handleSubmit}>
-            {profile.profile_picture_url && <img src={profile.profile_picture_url} alt="Profile" style={{ maxWidth: '200px', maxHeight: '200px' }} />}
+            <img src={profile.profile_picture_url || defaultProfilePic} alt="Profile" style={{ maxWidth: '200px', maxHeight: '200px' }} />
             <p />
             <input type="email" name="email" value={profile.email} onChange={handleChange} required placeholder="Email" />
             <input type="text" name="first_name" value={profile.first_name} onChange={handleChange} required placeholder="First Name" />
