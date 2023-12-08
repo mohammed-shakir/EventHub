@@ -1,4 +1,4 @@
-const { ref, uploadBytes } = require('firebase/storage');
+const { ref, uploadBytes, getDownloadURL } = require('firebase/storage');
 const storage = require('../firebaseConfig');
 
 const uploadFileToStorage = (file, filePath) => {
@@ -18,4 +18,9 @@ const uploadFileToStorage = (file, filePath) => {
   });
 };
 
-module.exports = { uploadFileToStorage };
+const getFirebaseStorageUrl = (filePath) => {
+  const storageRef = ref(storage, filePath);
+  return getDownloadURL(storageRef);
+};
+
+module.exports = { uploadFileToStorage, getFirebaseStorageUrl };

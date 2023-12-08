@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getUserProfile, updateUserProfile, deleteUserProfile, logout, uploadProfilePicture } from '../api_calls/user';
+import { getUserProfile, updateUserProfile, deleteUserProfile, logout, uploadProfilePicture, getProfilePictureUrl } from '../api_calls/user';
 
 const UserProfileForm = () => {
     const [profile, setProfile] = useState({
@@ -7,24 +7,37 @@ const UserProfileForm = () => {
         first_name: '',
         last_name: '',
         bio: '',
+        profile_picture_url: '',
     });
     const fileInputRef = useRef(null);
 
-    useEffect(() => {
-        const fetchUserProfile = async () => {
-            try {
-                const userProfile = await getUserProfile();
+    const fetchUserProfile = async () => {
+        try {
+            const userProfile = await getUserProfile();
+            if (userProfile.profile_picture_url) {
+                const url = await getProfilePictureUrl(userProfile.profile_picture_url);
                 setProfile({
                     email: userProfile.email || '',
                     first_name: userProfile.first_name || '',
                     last_name: userProfile.last_name || '',
                     bio: userProfile.bio || '',
+                    profile_picture_url: url
                 });
-            } catch (error) {
-                console.error('Error fetching user profile', error);
+            } else {
+                setProfile({
+                    email: userProfile.email || '',
+                    first_name: userProfile.first_name || '',
+                    last_name: userProfile.last_name || '',
+                    bio: userProfile.bio || '',
+                    profile_picture_url: ''
+                });
             }
-        };
+        } catch (error) {
+            console.error('Error fetching user profile', error);
+        }
+    };
 
+    useEffect(() => {
         fetchUserProfile();
     }, []);
 
@@ -57,7 +70,7 @@ const UserProfileForm = () => {
             const file = fileInputRef.current.files[0];
             try {
                 await uploadProfilePicture(file);
-                // fetch updated user profile to update UI
+                await fetchUserProfile();
             } catch (error) {
                 console.error('Error uploading profile picture', error);
             }
@@ -66,6 +79,8 @@ const UserProfileForm = () => {
 
     return (
         <form onSubmit={handleSubmit}>
+            {profile.profile_picture_url && <img src={profile.profile_picture_url} alt="Profile" style={{ maxWidth: '200px', maxHeight: '200px' }} />}
+            <p />
             <input type="email" name="email" value={profile.email} onChange={handleChange} required placeholder="Email" />
             <input type="text" name="first_name" value={profile.first_name} onChange={handleChange} required placeholder="First Name" />
             <input type="text" name="last_name" value={profile.last_name} onChange={handleChange} required placeholder="Last Name" />

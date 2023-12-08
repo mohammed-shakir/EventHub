@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const { initializeApp, getApps, getApp } = require('firebase/app');
 const { getStorage } = require('firebase/storage');
 

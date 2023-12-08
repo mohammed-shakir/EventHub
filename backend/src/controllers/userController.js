@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const { validationResult } = require('express-validator');
 const upload = require('../middleware/multerConfig');
 const { uploadFileToStorage } = require('../utils/firebaseStorageUtils');
+const { getFirebaseStorageUrl } = require('../utils/firebaseStorageUtils');
 
 
 exports.register = async (req, res) => {
@@ -69,6 +70,16 @@ exports.uploadUserProfilePicture = async (req, res) => {
     }
 };
 
+exports.getProfilePictureUrl = async (req, res) => {
+    try {
+        const filePath = req.query.filePath;
+        const url = await getFirebaseStorageUrl(filePath);
+        res.json({ url });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching file URL');
+    }
+};
 
 
 exports.login = async (req, res) => {
