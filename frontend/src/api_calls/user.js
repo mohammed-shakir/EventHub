@@ -24,20 +24,6 @@ export const uploadProfilePicture = async (fileData) => {
   }
 };
 
-export const getProfilePictureUrl = async (filePath) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/profile/picture`, {
-      params: { filePath },
-      headers: getAuthHeader()
-    });
-    return response.data.url;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-
 export const loginUser = async (credentials) => {
   try {
     const response = await axios.post(`${BASE_URL}/login`, credentials);

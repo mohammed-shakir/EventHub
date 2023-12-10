@@ -58,29 +58,19 @@ exports.uploadUserProfilePicture = async (req, res) => {
 
         await uploadFileToStorage(req.file, filePath);
 
+        const downloadURL = await getFirebaseStorageUrl(filePath);
+
         await pool.query(
             'UPDATE Profiles SET profile_picture_url = $1 WHERE user_id = $2',
-            [filePath, userId]
+            [downloadURL, userId]
         );
 
-        return res.status(200).json({ message: 'Profile picture uploaded successfully', filePath });
+        return res.status(200).json({ message: 'Profile picture uploaded successfully', filePath: downloadURL });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error uploading file');
     }
 };
-
-exports.getProfilePictureUrl = async (req, res) => {
-    try {
-        const filePath = req.query.filePath;
-        const url = await getFirebaseStorageUrl(filePath);
-        res.json({ url });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error fetching file URL');
-    }
-};
-
 
 exports.login = async (req, res) => {
     const errors = validationResult(req);

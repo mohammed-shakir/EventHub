@@ -1,53 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { getUserProfile, updateUserProfile, deleteUserProfile, logout, uploadProfilePicture, getProfilePictureUrl } from '../api_calls/user';
+import React, { useRef, useContext } from 'react';
+import { UserContext } from '../provider/UserProvider';
+import { updateUserProfile, deleteUserProfile, logout, uploadProfilePicture } from '../api_calls/user';
+import UserProfilePicture from './UserProfilePicture';
 
 const UserProfileForm = () => {
-    const [profile, setProfile] = useState({
-        email: '',
-        first_name: '',
-        last_name: '',
-        bio: '',
-        profile_picture_url: '',
-    });
+    const { userProfile, setUserProfile } = useContext(UserContext);
     const fileInputRef = useRef(null);
 
-    const defaultProfilePic = '/assets/default/pfp.png';
-
-    const fetchUserProfile = async () => {
-        try {
-            const userProfile = await getUserProfile();
-            let profilePicUrl = defaultProfilePic;
-            if (userProfile.profile_picture_url) {
-                try {
-                    profilePicUrl = await getProfilePictureUrl(userProfile.profile_picture_url);
-                } catch (error) {
-                    console.error('Error fetching profile picture URL', error);
-                }
-            }
-            setProfile({
-                email: userProfile.email || '',
-                first_name: userProfile.first_name || '',
-                last_name: userProfile.last_name || '',
-                bio: userProfile.bio || '',
-                profile_picture_url: profilePicUrl,
-            });
-        } catch (error) {
-            console.error('Error fetching user profile', error);
-        }
-    };
-
-    useEffect(() => {
-        fetchUserProfile();
-    }, []);
+    if (!userProfile) {
+        return <div>Loading user profile...</div>;
+    }
 
     const handleChange = (e) => {
-        setProfile({ ...profile, [e.target.name]: e.target.value });
+        setUserProfile({ ...userProfile, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            await updateUserProfile(profile);
+            await updateUserProfile(userProfile);
         } catch (error) {
             console.error('Error updating profile', error);
         }
@@ -68,8 +39,8 @@ const UserProfileForm = () => {
         if (fileInputRef.current && fileInputRef.current.files[0]) {
             const file = fileInputRef.current.files[0];
             try {
-                await uploadProfilePicture(file);
-                await fetchUserProfile();
+                const response = await uploadProfilePicture(file);
+                setUserProfile({ ...userProfile, profile_picture_url: response.filePath });
             } catch (error) {
                 console.error('Error uploading profile picture', error);
             }
@@ -78,12 +49,12 @@ const UserProfileForm = () => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <img src={profile.profile_picture_url || defaultProfilePic} alt="Profile" style={{ maxWidth: '200px', maxHeight: '200px' }} />
+            <UserProfilePicture imageUrl={userProfile.profile_picture_url} />
             <p />
-            <input type="email" name="email" value={profile.email} onChange={handleChange} required placeholder="Email" />
-            <input type="text" name="first_name" value={profile.first_name} onChange={handleChange} required placeholder="First Name" />
-            <input type="text" name="last_name" value={profile.last_name} onChange={handleChange} required placeholder="Last Name" />
-            <textarea name="bio" value={profile.bio} onChange={handleChange} placeholder="Bio" />
+            <input type="email" name="email" value={userProfile.email} onChange={handleChange} required placeholder="Email" />
+            <input type="text" name="first_name" value={userProfile.first_name} onChange={handleChange} required placeholder="First Name" />
+            <input type="text" name="last_name" value={userProfile.last_name} onChange={handleChange} required placeholder="Last Name" />
+            <textarea name="bio" value={userProfile.bio || ""} onChange={handleChange} placeholder="Bio" />
             <button type="submit">Update Profile</button>
             <button onClick={handleDeleteAccount}>Delete Account</button>
             <p />

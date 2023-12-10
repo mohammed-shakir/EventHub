@@ -1,23 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { getUserProfile } from '../api_calls/user';
-import { useState, useEffect } from 'react';
+import { UserContext } from '../provider/UserProvider';
 
 const Navbar = () => {
-    const [userProfile, setUserProfile] = useState(null);
-
-    useEffect(() => {
-        const fetchUserProfile = async () => {
-            try {
-                const profile = await getUserProfile();
-                setUserProfile(profile);
-            } catch (error) {
-                console.error('Error fetching user profile', error);
-            }
-        };
-
-        fetchUserProfile();
-    }, []);
+    const { userProfile } = useContext(UserContext);
 
     return (
         <nav>

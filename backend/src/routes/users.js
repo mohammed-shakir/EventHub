@@ -22,6 +22,5 @@ router.delete('/admin_delete_user/:userId', auth, admin, userController.adminDel
 router.get('/get_all_users', auth, admin, userController.getAllUsers);
 router.post('/auth/google', userController.authGoogle);
 router.post('/profile/picture', auth, upload.single('profilePic'), userController.uploadUserProfilePicture);
-router.get('/profile/picture', auth, userController.getProfilePictureUrl);
 
 module.exports = router;
