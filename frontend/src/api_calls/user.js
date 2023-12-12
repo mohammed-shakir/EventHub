@@ -12,6 +12,18 @@ export const registerUser = async (userData) => {
   }
 };
 
+export const uploadProfilePicture = async (fileData) => {
+  const formData = new FormData();
+  formData.append('profilePic', fileData);
+
+  try {
+    const response = await axios.post(`${BASE_URL}/profile/picture`, formData, { headers: getAuthHeader() });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const loginUser = async (credentials) => {
   try {
     const response = await axios.post(`${BASE_URL}/login`, credentials);

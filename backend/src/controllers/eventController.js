@@ -1,6 +1,7 @@
 const pool = require('../utils/database');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
+const { uploadFileToStorage, getFirebaseStorageUrl } = require('../utils/firebaseStorageUtils');
 
 exports.addEvent = async (req, res) => {
     const errors = validationResult(req);
@@ -30,6 +31,21 @@ exports.addEvent = async (req, res) => {
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Server error');
+    }
+};
+
+exports.uploadEventPicture = async (req, res) => {
+    try {
+        const fileName = req.file.originalname;
+        const filePath = `events/pictures/${fileName}`;
+
+        await uploadFileToStorage(req.file, filePath);
+        const downloadURL = await getFirebaseStorageUrl(filePath);
+
+        return res.status(200).json({ message: 'Event picture uploaded successfully', filePath: downloadURL });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error uploading file');
     }
 };
 

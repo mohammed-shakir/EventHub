@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getEvents, registerForEvent } from '../api_calls/event';
 import { getCategories } from '../api_calls/category';
 import { useNavigate } from 'react-router-dom';
+import EventPicture from './EventPicture';
 
 const EventList = () => {
     const [events, setEvents] = useState([]);
@@ -54,7 +55,7 @@ const EventList = () => {
                     <li key={event.event_id}>
                         <h3>{event.title}</h3>
                         <p>Organized by: {event.organizer_name}</p>
-                        <p>{event.image_url && <img src={event.image_url} alt={event.image_url} />}</p>
+                        <p><EventPicture imageUrl={event.image_url} /></p>
                         <p>Location: {event.location}</p>
                         <p>Category: {getCategoryName(event.category_id)}</p>
                         <button onClick={() => navigate(`/events/${event.event_id}`)}>View more</button>

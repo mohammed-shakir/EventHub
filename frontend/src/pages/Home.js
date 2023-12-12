@@ -1,26 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import Navbar from '../components/Navbar.js';
-import { getUserProfile, logout as performLogout } from '../api_calls/user';
+import { UserContext } from '../provider/UserProvider';
+import { logout as performLogout } from '../api_calls/user';
 
 const Home = () => {
-    const [userProfile, setUserProfile] = useState(null);
-
-    useEffect(() => {
-        const fetchUserProfile = async () => {
-            try {
-                const profile = await getUserProfile();
-                setUserProfile(profile);
-            } catch (error) {
-                console.error('Error fetching user profile', error);
-            }
-        };
-
-        fetchUserProfile();
-    }, []);
+    const { userProfile } = useContext(UserContext);
 
     const logout = () => {
         performLogout();
-        setUserProfile(null);
     };
 
     return (

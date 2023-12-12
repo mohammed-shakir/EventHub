@@ -12,6 +12,17 @@ export const addEvent = async (eventData) => {
     }
 };
 
+export const uploadEventPicture = async (fileData) => {
+    const formData = new FormData();
+    formData.append('eventPic', fileData);
+
+    try {
+        const response = await axios.post(`${BASE_URL}/uploadEventPicture`, formData, { headers: getAuthHeader() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
 
 export const getEvents = async () => {
     try {

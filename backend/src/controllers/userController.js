@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const crypto = require('crypto');
 const { validationResult } = require('express-validator');
+const upload = require('../middleware/multerConfig');
+const { uploadFileToStorage } = require('../utils/firebaseStorageUtils');
+const { getFirebaseStorageUrl } = require('../utils/firebaseStorageUtils');
 
 
 exports.register = async (req, res) => {
@@ -44,6 +47,28 @@ exports.register = async (req, res) => {
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Server error');
+    }
+};
+
+exports.uploadUserProfilePicture = async (req, res) => {
+    try {
+        const userId = req.user.user_id;
+        const fileName = req.file.originalname;
+        const filePath = `users/${userId}/profile_picture/${fileName}`;
+
+        await uploadFileToStorage(req.file, filePath);
+
+        const downloadURL = await getFirebaseStorageUrl(filePath);
+
+        await pool.query(
+            'UPDATE Profiles SET profile_picture_url = $1 WHERE user_id = $2',
+            [downloadURL, userId]
+        );
+
+        return res.status(200).json({ message: 'Profile picture uploaded successfully', filePath: downloadURL });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error uploading file');
     }
 };
 

@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import Navbar from '../components/Navbar.js';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getEventById, updateEvent, deleteEvent } from '../api_calls/event';
-import { getUserProfile } from '../api_calls/user';
+import { getEventById, updateEvent, deleteEvent, uploadEventPicture } from '../api_calls/event';
 import { getCategories } from '../api_calls/category';
+import { UserContext } from '../provider/UserProvider';
+import EventPicture from '../components/EventPicture';
 
 const EventDetails = () => {
     const [event, setEvent] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const [updatedEvent, setUpdatedEvent] = useState({});
-    const [userProfile, setUserProfile] = useState(null);
     const [categories, setCategories] = useState([]);
     const { eventId } = useParams();
     const navigate = useNavigate();
+    const { userProfile } = useContext(UserContext);
+
+    const fileInputRef = useRef(null);
 
     const formatDateForInput = (dateTimeStr) => {
         const date = new Date(dateTimeStr);
@@ -20,7 +23,7 @@ const EventDetails = () => {
     };
 
     useEffect(() => {
-        const fetchEventAndUser = async () => {
+        const fetchEventDetails = async () => {
             try {
                 const eventData = await getEventById(eventId);
                 setEvent(eventData);
@@ -29,8 +32,6 @@ const EventDetails = () => {
                     start_time: formatDateForInput(eventData.start_time),
                     end_time: formatDateForInput(eventData.end_time)
                 });
-                const profile = await getUserProfile();
-                setUserProfile(profile);
             } catch (error) {
                 console.error('Error fetching event details', error);
             }
@@ -45,7 +46,7 @@ const EventDetails = () => {
             }
         };
 
-        fetchEventAndUser();
+        fetchEventDetails();
         fetchCategories();
     }, [eventId]);
 
@@ -57,11 +58,26 @@ const EventDetails = () => {
         setUpdatedEvent({ ...updatedEvent, [e.target.name]: e.target.value });
     };
 
-    const handleUpdate = async (event) => {
-        event.preventDefault();
+    const handleFileUpload = async (file) => {
         try {
-            await updateEvent(eventId, updatedEvent);
-            setEvent(updatedEvent);
+            const response = await uploadEventPicture(file);
+            return response.filePath;
+        } catch (error) {
+            console.error('Error uploading event picture', error);
+        }
+    };
+
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        try {
+            let imageUrl = '';
+            if (fileInputRef.current && fileInputRef.current.files[0]) {
+                imageUrl = await handleFileUpload(fileInputRef.current.files[0]);
+            }
+
+            const updatedData = { ...updatedEvent, image_url: imageUrl };
+            await updateEvent(eventId, updatedData);
+            setEvent(updatedData);
             toggleEditMode();
         } catch (error) {
             console.error('Error updating event', error);
@@ -87,7 +103,7 @@ const EventDetails = () => {
             {!editMode ? (
                 <>
                     <h1>{event.title}</h1>
-                    <img src={event.image_url} alt={event.image_url} />
+                    <EventPicture imageUrl={event.image_url} />
                     <p>Location: {event.location}</p>
                     <p>About: {event.description}</p>
                     <p>Start Time: {event.start_time}</p>
@@ -114,18 +130,13 @@ const EventDetails = () => {
                     <input type="datetime-local" name="start_time" value={updatedEvent.start_time} onChange={handleChange} required />
                     <input type="datetime-local" name="end_time" value={updatedEvent.end_time} onChange={handleChange} required />
                     <input type="text" name="location" value={updatedEvent.location} onChange={handleChange} required placeholder="Location"/>
-                    <input type="text" name="image_url" value={updatedEvent.image_url} onChange={handleChange} placeholder="Image URL"/>
-                    <select
-                        name="category_id"
-                        value={updatedEvent.category_id}
-                        onChange={handleChange}
-                    >
+                    <select name="category_id" value={updatedEvent.category_id || 0} onChange={handleChange}>
                         {categories.map(category => (
-                            <option key={category.category_id} value={category.category_id}>
-                                {category.name}
-                            </option>
+                            <option key={category.category_id} value={category.category_id}>{category.name}</option>
                         ))}
                     </select>
+                    <p />
+                    <input type="file" ref={fileInputRef} />
                     <button type="submit">Update Event</button>
                     <button type="button" onClick={toggleEditMode}>Cancel</button>
                 </form>
