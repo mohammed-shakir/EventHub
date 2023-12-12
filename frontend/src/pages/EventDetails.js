@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getEventById, updateEvent, deleteEvent } from '../api_calls/event';
 import { getCategories } from '../api_calls/category';
 import { UserContext } from '../provider/UserProvider';
+import EventPicture from '../components/EventPicture';
 
 const EventDetails = () => {
     const [event, setEvent] = useState(null);
@@ -85,7 +86,7 @@ const EventDetails = () => {
             {!editMode ? (
                 <>
                     <h1>{event.title}</h1>
-                    <img src={event.image_url} alt={event.title} />
+                    <EventPicture imageUrl={event.image_url} />
                     <p>Location: {event.location}</p>
                     <p>About: {event.description}</p>
                     <p>Start Time: {event.start_time}</p>

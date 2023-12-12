@@ -1,33 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { getProfilePictureUrl } from '../api_calls/user';
+import React from 'react';
 
 const defaultEventImage = '/assets/default/event-background.png';
 
-const EventPicture = ({ imageUrl, eventId }) => {
-    const [eventImageUrl, setEventImageUrl] = useState('');
-
-    useEffect(() => {
-        const fetchEventImage = async () => {
-            try {
-                if (imageUrl) {
-                    const url = await getProfilePictureUrl(imageUrl); // Adjust the API call as needed
-                    setEventImageUrl(url);
-                }
-            } catch (error) {
-                console.error('Error fetching event image', error);
-                setEventImageUrl(defaultEventImage);
-            }
-        };
-
-        fetchEventImage();
-    }, [imageUrl, eventId]);
+const EventPicture = ({ imageUrl }) => {
+    const eventPicUrl = imageUrl || defaultEventImage;
 
     return (
         <img 
-            src={eventImageUrl || defaultEventImage} 
+            src={eventPicUrl} 
             alt="Event" 
-            onError={() => setEventImageUrl(defaultEventImage)}
-            style={{ maxWidth: '200px', maxHeight: '200px' }} 
+            style={{ maxWidth: '400px', maxHeight: '200px' }}
+            onError={(e) => e.target.src = defaultEventImage}
         />
     );
 };
