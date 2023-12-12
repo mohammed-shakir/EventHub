@@ -45,50 +45,12 @@ const AddEventForm = () => {
     return (
         <form onSubmit={handleSubmit}>
             <h2>Add Event</h2>
-            <input
-                type="text"
-                name="title"
-                value={newEvent.title}
-                onChange={handleChange}
-                required
-                placeholder="Title"
-            />
-            <textarea
-                name="description"
-                value={newEvent.description}
-                onChange={handleChange}
-                required
-                placeholder="Description"
-            />
-            <input
-                type="datetime-local"
-                name="start_time"
-                value={newEvent.start_time}
-                onChange={handleChange}
-                required
-            />
-            <input
-                type="datetime-local"
-                name="end_time"
-                value={newEvent.end_time}
-                onChange={handleChange}
-                required
-            />
-            <input
-                type="text"
-                name="location"
-                value={newEvent.location}
-                onChange={handleChange}
-                required
-                placeholder="Location"
-            />
-            <input
-                type="text"
-                name="image_url"
-                value={newEvent.image_url}
-                onChange={handleChange}
-                placeholder="Image URL"
-            />
+            <input type="text" name="title" value={newEvent.title} onChange={handleChange} required placeholder="Title" />
+            <textarea name="description" value={newEvent.description} onChange={handleChange} required placeholder="Description" />
+            <input type="datetime-local" name="start_time" value={newEvent.start_time} onChange={handleChange} required />
+            <input type="datetime-local" name="end_time" value={newEvent.end_time} onChange={handleChange} required />
+            <input type="text" name="location" value={newEvent.location} onChange={handleChange} required placeholder="Location" />
+            <input type="text" name="image_url" value={newEvent.image_url} onChange={handleChange} placeholder="Image URL" />
             <select
                 name="category_id"
                 value={newEvent.category_id}
