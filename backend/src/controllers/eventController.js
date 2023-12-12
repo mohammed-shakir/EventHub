@@ -42,8 +42,6 @@ exports.uploadEventPicture = async (req, res) => {
         await uploadFileToStorage(req.file, filePath);
         const downloadURL = await getFirebaseStorageUrl(filePath);
 
-        // await pool.query('UPDATE Events SET image_url = $1 WHERE event_id = $2', [downloadURL, eventId]);
-
         return res.status(200).json({ message: 'Event picture uploaded successfully', filePath: downloadURL });
     } catch (error) {
         console.error(error);

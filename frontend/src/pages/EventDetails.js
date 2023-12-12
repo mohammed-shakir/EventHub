@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import Navbar from '../components/Navbar.js';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getEventById, updateEvent, deleteEvent } from '../api_calls/event';
+import { getEventById, updateEvent, deleteEvent, uploadEventPicture } from '../api_calls/event';
 import { getCategories } from '../api_calls/category';
 import { UserContext } from '../provider/UserProvider';
 import EventPicture from '../components/EventPicture';
@@ -14,6 +14,8 @@ const EventDetails = () => {
     const { eventId } = useParams();
     const navigate = useNavigate();
     const { userProfile } = useContext(UserContext);
+
+    const fileInputRef = useRef(null);
 
     const formatDateForInput = (dateTimeStr) => {
         const date = new Date(dateTimeStr);
@@ -56,11 +58,26 @@ const EventDetails = () => {
         setUpdatedEvent({ ...updatedEvent, [e.target.name]: e.target.value });
     };
 
+    const handleFileUpload = async (file) => {
+        try {
+            const response = await uploadEventPicture(file);
+            return response.filePath;
+        } catch (error) {
+            console.error('Error uploading event picture', error);
+        }
+    };
+
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            await updateEvent(eventId, updatedEvent);
-            setEvent(updatedEvent);
+            let imageUrl = '';
+            if (fileInputRef.current && fileInputRef.current.files[0]) {
+                imageUrl = await handleFileUpload(fileInputRef.current.files[0]);
+            }
+
+            const updatedData = { ...updatedEvent, image_url: imageUrl };
+            await updateEvent(eventId, updatedData);
+            setEvent(updatedData);
             toggleEditMode();
         } catch (error) {
             console.error('Error updating event', error);
@@ -113,12 +130,13 @@ const EventDetails = () => {
                     <input type="datetime-local" name="start_time" value={updatedEvent.start_time} onChange={handleChange} required />
                     <input type="datetime-local" name="end_time" value={updatedEvent.end_time} onChange={handleChange} required />
                     <input type="text" name="location" value={updatedEvent.location} onChange={handleChange} required placeholder="Location"/>
-                    <input type="text" name="image_url" value={updatedEvent.image_url} onChange={handleChange} placeholder="Image URL"/>
-                    <select name="category_id" value={updatedEvent.category_id} onChange={handleChange}>
+                    <select name="category_id" value={updatedEvent.category_id || 0} onChange={handleChange}>
                         {categories.map(category => (
                             <option key={category.category_id} value={category.category_id}>{category.name}</option>
                         ))}
                     </select>
+                    <p />
+                    <input type="file" ref={fileInputRef} />
                     <button type="submit">Update Event</button>
                     <button type="button" onClick={toggleEditMode}>Cancel</button>
                 </form>
