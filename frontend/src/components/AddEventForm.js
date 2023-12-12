@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { addEvent } from '../api_calls/event';
+import React, { useState, useRef } from 'react';
+import { addEvent, uploadEventPicture } from '../api_calls/event';
 import { getCategories } from '../api_calls/category';
 import { useEffect } from 'react';
 
@@ -10,8 +10,8 @@ const AddEventForm = () => {
         start_time: '',
         end_time: '',
         location: '',
-        image_url: ''
     });
+    const fileInputRef = useRef(null);
 
     const [categories, setCategories] = useState([]);
 
@@ -32,10 +32,24 @@ const AddEventForm = () => {
         setNewEvent({ ...newEvent, [e.target.name]: e.target.value });
     };
 
+    const handleFileUpload = async (file) => {
+        try {
+            const response = await uploadEventPicture(file);
+            return response.filePath;
+        } catch (error) {
+            console.error('Error uploading event picture', error);
+        }
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            await addEvent(newEvent);
+            let imageUrl = '';
+            if (fileInputRef.current && fileInputRef.current.files[0]) {
+                imageUrl = await handleFileUpload(fileInputRef.current.files[0]);
+            }
+
+            await addEvent({ ...newEvent, image_url: imageUrl });
             window.location.reload();
         } catch (error) {
             console.error('Error adding event', error);
@@ -50,7 +64,6 @@ const AddEventForm = () => {
             <input type="datetime-local" name="start_time" value={newEvent.start_time} onChange={handleChange} required />
             <input type="datetime-local" name="end_time" value={newEvent.end_time} onChange={handleChange} required />
             <input type="text" name="location" value={newEvent.location} onChange={handleChange} required placeholder="Location" />
-            <input type="text" name="image_url" value={newEvent.image_url} onChange={handleChange} placeholder="Image URL" />
             <select
                 name="category_id"
                 value={newEvent.category_id}
@@ -62,6 +75,8 @@ const AddEventForm = () => {
                     </option>
                 ))}
             </select>
+            <p />
+            <input type="file" ref={fileInputRef} />
             <button type="submit">Add Event</button>
         </form>
     );
