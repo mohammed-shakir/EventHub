@@ -44,3 +44,8 @@ CREATE TABLE Registrations (
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
     FOREIGN KEY (event_id) REFERENCES Events(event_id)
 );
+
+INSERT INTO Categories (name, description)
+VALUES
+    ('Party', 'Party Event'),
+    ('Seminar', 'Seminar Event');
