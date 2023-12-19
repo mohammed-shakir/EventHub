@@ -1,5 +1,6 @@
 const request = require('supertest');
 const app = require('../../server');
+const pool = require('../../src/utils/database');
 
 jest.mock('../../src/utils/database', () => ({
     query: jest.fn().mockImplementation((query, values) => {
