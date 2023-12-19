@@ -15,6 +15,10 @@ app.use('/api/users', require('./src/routes/users'));
 app.use('/api/events', require('./src/routes/events'));
 app.use('/api/categories', require('./src/routes/categories'));
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    });
+}
+
+module.exports = app;
