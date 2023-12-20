@@ -1,4 +1,4 @@
-const pool = require('../utils/database');
+const { pool } = require('../utils/database');
 const { validationResult } = require('express-validator');
 
 exports.getCategories = async (req, res) => {

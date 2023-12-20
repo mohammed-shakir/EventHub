@@ -1,4 +1,4 @@
-const pool = require('../utils/database');
+const { pool } = require('../utils/database');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const { uploadFileToStorage, getFirebaseStorageUrl } = require('../utils/firebaseStorageUtils');
@@ -16,18 +16,20 @@ exports.addEvent = async (req, res) => {
 
         const organizer_id = decoded.user_id;
         const created_at = new Date();
-
-        const insertQuery = `INSERT INTO Events 
-            (organizer_id, title, description, start_time, end_time, location, image_url, category_id, created_at) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
         
         if (decoded.role !== 'Organizer' && decoded.role !== 'Admin') {
             return res.status(403).send('Unauthorized to create events');
         }
         
-        await pool.query(insertQuery, [organizer_id, title, description, start_time, end_time, location, image_url, category_id, created_at]);
+        const insertQuery = `INSERT INTO Events
+            (organizer_id, title, description, start_time, end_time, location, image_url, category_id, created_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            RETURNING event_id`;
 
-        res.status(200).send('Event added successfully');
+        const insertResult = await pool.query(insertQuery, [organizer_id, title, description, start_time, end_time, location, image_url, category_id, created_at]);
+
+        const eventId = insertResult.rows[0].event_id;
+        res.status(200).json({ message: 'Event added successfully', eventId: eventId });
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Server error');
