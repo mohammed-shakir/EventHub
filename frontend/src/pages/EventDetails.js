@@ -70,7 +70,7 @@ const EventDetails = () => {
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            let imageUrl = '';
+            let imageUrl = event.image_url;
             if (fileInputRef.current && fileInputRef.current.files[0]) {
                 imageUrl = await handleFileUpload(fileInputRef.current.files[0]);
             }
