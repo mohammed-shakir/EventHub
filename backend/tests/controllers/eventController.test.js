@@ -82,11 +82,3 @@ describe('EventController Tests', () => {
         });
     });
 });
-
-
-/*DELETE FROM events
-WHERE event_id = (SELECT max(event_id) FROM events);
-DELETE FROM profiles
-WHERE user_id = (SELECT max(user_id) FROM profiles);
-DELETE FROM users
-WHERE user_id = (SELECT max(user_id) FROM users);*/
