@@ -1,6 +1,5 @@
 const request = require('supertest');
 const app = require('../../server');
-const pool = require('../../src/utils/database');
 
 describe('UserController Tests', () => {
     describe('POST /api/users/register', () => {

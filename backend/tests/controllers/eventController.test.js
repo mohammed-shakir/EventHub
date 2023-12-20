@@ -5,7 +5,7 @@ let token;
 let eventId;
 
 beforeAll(async () => {
-    // Register
+    // Register Organizer
     const newUser = {
         email: 'organizer@example.com',
         password: 'organizerPassword',
@@ -20,7 +20,7 @@ beforeAll(async () => {
 
     expect(responseRegister.statusCode).toBe(201);
 
-    // Login
+    // Login Organizer
     const loginUser = {
         email: 'organizer@example.com',
         password: 'organizerPassword'
@@ -35,13 +35,11 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    // Delete the event if it was created
     const deleteEventResponse = await request(app)
         .delete(`/api/events/${eventId}`)
         .set('Authorization', `Bearer ${token}`);
     expect(deleteEventResponse.statusCode).toBe(200);
 
-    // Delete the user profile
     const deleteUserResponse = await request(app)
         .delete('/api/users/profile')
         .set('Authorization', `Bearer ${token}`);
@@ -68,6 +66,7 @@ describe('EventController Tests', () => {
             expect(response.statusCode).toBe(200);
 
             eventId = response.body.eventId;
+            expect(eventId).toBeDefined();
         });
     });
 
