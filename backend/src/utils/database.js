@@ -9,4 +9,8 @@ const pool = new Pool({
     port: process.env.DB_PORT,
 });
 
-module.exports = pool;
+const closeDatabase = async () => {
+  await pool.end();
+};
+
+module.exports = { pool, closeDatabase };

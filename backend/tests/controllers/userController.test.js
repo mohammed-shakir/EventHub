@@ -1,5 +1,10 @@
 const request = require('supertest');
 const app = require('../../server');
+const { closeDatabase } = require('../../src/utils/database');
+
+afterAll(async () => {
+    await closeDatabase();
+});
 
 describe('UserController Tests', () => {
     describe('POST /api/users/register', () => {

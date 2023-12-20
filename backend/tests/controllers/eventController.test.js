@@ -1,11 +1,11 @@
 const request = require('supertest');
 const app = require('../../server');
+const { closeDatabase } = require('../../src/utils/database');
 
 let token;
 let eventId;
 
 beforeAll(async () => {
-    // Register Organizer
     const newUser = {
         email: 'organizer@example.com',
         password: 'organizerPassword',
@@ -20,7 +20,6 @@ beforeAll(async () => {
 
     expect(responseRegister.statusCode).toBe(201);
 
-    // Login Organizer
     const loginUser = {
         email: 'organizer@example.com',
         password: 'organizerPassword'
@@ -44,6 +43,8 @@ afterAll(async () => {
         .delete('/api/users/profile')
         .set('Authorization', `Bearer ${token}`);
     expect(deleteUserResponse.statusCode).toBe(200);
+
+    await closeDatabase();
 });
 
 describe('EventController Tests', () => {

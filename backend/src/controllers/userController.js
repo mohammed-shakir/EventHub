@@ -1,4 +1,4 @@
-const pool = require('../utils/database');
+const { pool } = require('../utils/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');

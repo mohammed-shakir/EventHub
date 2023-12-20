@@ -1,4 +1,4 @@
-const pool = require('../utils/database');
+const { pool } = require('../utils/database');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const { uploadFileToStorage, getFirebaseStorageUrl } = require('../utils/firebaseStorageUtils');
