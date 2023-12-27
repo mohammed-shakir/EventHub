@@ -119,6 +119,7 @@ exports.authGoogle = async (req, res) => {
             audience: process.env.GOOGLE_CLIENT_ID,
         });
         const payload = ticket.getPayload();
+        //console.log(payload);
 
         // Extract user info from payload
         const { email, given_name, family_name } = payload;
@@ -222,6 +223,11 @@ exports.deleteUserProfile = async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.user_id;
+
+        const userResult = await client.query('SELECT * FROM Users WHERE user_id = $1', [userId]);
+        if (userResult.rowCount === 0) {
+            throw new Error('User does not exist');
+        }
 
         await client.query('DELETE FROM Registrations WHERE user_id = $1', [userId]);
         await client.query('DELETE FROM Profiles WHERE user_id = $1', [userId]);
